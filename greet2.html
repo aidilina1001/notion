@@ -5,6 +5,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yesteryear&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- 引入和风天气图标字体 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/qweather-icons@1.6.0/font/qweather-icons.css">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,20 +18,9 @@
             background-color: #fff;
             line-height: 1.6;
         }
-        h1 {
-            margin-top: 0;
-        }
-        /*CSS START*/
-        .full-table {
-            display: table;
-            height: 100%;
-            width: 100%;
-        }
-        .table-cell {
-            display: table-cell;
-            vertical-align: middle;
-            text-align: center;
-        }
+        h1 { margin-top: 0; }
+        .full-table { display: table; height: 100%; width: 100%; }
+        .table-cell { display: table-cell; vertical-align: middle; text-align: center; }
         .card {
             padding: 10px 25px;
             border-radius: 10px;
@@ -38,6 +29,28 @@
             color: #fff;
             display: inline-block;
             box-shadow: 2px 2px 1px 0px #9a72ba;
+        }
+        .greet{
+            display:inline;
+            font-family:  "Yesteryear", cursive;
+            font-size: 3rem;
+            padding-right: 30px;
+        }
+        /* 使用图标字体 */
+        .weather-icon {
+            font-family: 'qweather-icons';
+            font-size: 50px;
+            vertical-align: middle;
+        }
+        .date-container {
+            display: inline;
+            font-family: "Sour Gummy", sans-serif;
+            font-size: 2em;
+            padding-right: 30px;
+        }
+        .weekday {
+            font-size: 0.7em;
+            padding-left: 5px;
         }
         .clock {
             display: inline;
@@ -52,28 +65,6 @@
             font-size: 1.1em;
             display: inline-block;
         }
-        .date-container {
-            display: inline;
-            font-family: "Sour Gummy", sans-serif;
-            font-size: 2em;
-            padding-right: 30px;
-        }
-        .weekday {
-            font-size: 0.7em;
-            padding-left: 5px;
-        }
-        .greet{
-            display:inline;
-            font-family:  "Yesteryear", cursive;
-            font-size: 3rem;
-            padding-right: 30px;
-        }
-        .weather-icon {
-            display: inline;
-            vertical-align: text-bottom;
-            width: 50px;
-            height: 50px;
-        }
     </style>
 </head>
 <body>
@@ -83,7 +74,8 @@
       <div class="table-cell">
         <div class="card">
             <div class="greet" id="greet"></div>
-            <img id="weather-icon" class="weather-icon" src="" alt="">
+            <!-- 使用 <i> 元素并初始为晴天图标 -->
+            <i id="weather-icon" class="weather-icon qi-100"></i>
             <div class="date-container" id="date"></div>
           <div class="clock">
             <div class="time" id="hour"></div>
@@ -110,48 +102,38 @@
             var hour = zeros(today.getHours());
             var minutes = zeros(today.getMinutes());
             var seconds = zeros(today.getSeconds());
-            
             var hrs = today.getHours();
             var greet;
-            if (hrs >=6 && hrs < 12)
-                greet = 'Good Morning';
-            else if (hrs >= 12 && hrs < 18)
-                greet = 'Good Afternoon';
-            else if (hrs >=18 && hrs <24)
-                greet = 'Good Evening';
-            else
-                greet = 'Good Night';
-                
+            if (hrs >=6 && hrs < 12) greet = 'Good Morning';
+            else if (hrs >= 12 && hrs < 18) greet = 'Good Afternoon';
+            else if (hrs >=18 && hrs <24) greet = 'Good Evening';
+            else greet = 'Good Night';
             document.getElementById('greet').innerHTML = greet;
             document.getElementById('hour').innerHTML = hour;
             document.getElementById('min').innerHTML = minutes;
             document.getElementById('sec').innerHTML = seconds;
         }
 
-        function zeros(num) {
-            return num < 10 ? '0' + num : num;
-        }
+        function zeros(num) { return num < 10 ? '0' + num : num; }
 
         function dateTime() {
-            date();
-            clock();
-            setTimeout(dateTime, 500);
+            date(); clock(); setTimeout(dateTime, 500);
         }
 
-        // 调用和风天气 API 仅显示图标，每小时刷新一次
+        // 调用和风天气 API 获取 iconCode，并仅更新类名
         async function getWeather() {
             const apiKey = 'e72e4309ce714a289b8908415133ad69';
             const location = '101010900';
-            // 使用您在控制台配置的专属 API Host，例如 abcxyz.qweatherapi.com
-            const url = `https://kw67cd4fet.re.qweatherapi.com/v7/weather/now?location=${location}&key=${apiKey}&lang=zh&unit=m`;
-            const iconBase = 'https://cdn.qweather.com/v7/static/img/icon/';
+            const apiHost = 'kw67cd4fet.re.qweatherapi.com';  // 替换为专属 Host
+            const url = `https://${apiHost}/v7/weather/now?location=${location}&key=${apiKey}&lang=zh&unit=m`;
 
             try {
-                const res = await fetch(url);
+                const res = await fetch(url, { mode: 'cors' });
                 const data = await res.json();
                 if (data.code === '200' && data.now) {
-                    const icon = data.now.icon.padStart(3, '0');
-                    document.getElementById('weather-icon').src = `${iconBase}${icon}.png`;
+                    const code = data.now.icon;  // e.g. '305'
+                    const iconEl = document.getElementById('weather-icon');
+                    iconEl.className = `weather-icon qi-${code}`;
                 } else {
                     console.error('和风天气 API 返回异常：', data);
                 }
@@ -161,11 +143,9 @@
         }
 
         dateTime();
-        // 首次立即获取
+        // 首次获取并定时每小时刷新
         getWeather();
-        // 每小时自动获取一次
         setInterval(getWeather, 3600000);
     </script>
-
 </body>
 </html>
