@@ -4,6 +4,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Yesteryear&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <!-- 引入和风天气图标字体 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/qweather-icons@1.6.0/font/qweather-icons.css">
@@ -44,10 +45,16 @@
             font-size: 50px;         /* 针对图标字体大小 */
             line-height: 1;          /* 避免行高不一致 */
             vertical-align: middle;  /* 与文本垂直居中对齐 */
-            /* 向上微调位置 */
-            transform: translateY(-10px);
-            /* 与后续文字留出间隔 */
-            margin-right: 8px;
+            transform: translateY(-10px); /* 向上微调位置 */
+            margin-right: 8px;       /* 与后续文字留出间隔 */
+        }
+        /* 天气描述文字 */
+        .weather-text {
+            display: inline-block;
+            font-family: "ZCOOL KuaiLe", sans-serif;
+            font-size: 1.5em;
+            vertical-align: middle;
+            margin-right: 10px;
         }
         .date-container {
             display: inline;
@@ -55,23 +62,14 @@
             font-size: 2em;
             padding-right: 30px;
         }
-        .weekday {
-            font-size: 0.7em;
-            padding-left: 5px;
-        }
+        .weekday { font-size: 0.7em; padding-left: 5px; }
         .clock {
             display: inline;
             font-family: "Sour Gummy", sans-serif;
             font-size: 2em;
         }
-        .time {
-            display: inline;
-            min-width: 37px;
-        }
-        .colon {
-            font-size: 1.1em;
-            display: inline-block;
-        }
+        .time { display: inline; min-width: 37px; }
+        .colon { font-size: 1.1em; display: inline-block; }
     </style>
 </head>
 <body>
@@ -81,8 +79,9 @@
       <div class="table-cell">
         <div class="card">
             <div class="greet" id="greet"></div>
-            <!-- 使用 <i> 元素并初始为晴天图标 -->
+            <!-- 图标和文字描述 -->
             <i id="weather-icon" class="weather-icon qi-100"></i>
+            <span id="weather-text" class="weather-text"></span>
             <div class="date-container" id="date"></div>
           <div class="clock">
             <div class="time" id="hour"></div>
@@ -123,15 +122,13 @@
 
         function zeros(num) { return num < 10 ? '0' + num : num; }
 
-        function dateTime() {
-            date(); clock(); setTimeout(dateTime, 500);
-        }
+        function dateTime() { date(); clock(); setTimeout(dateTime, 500); }
 
-        // 调用和风天气 API 获取 iconCode，并仅更新类名
+        // 调用和风天气 API 获取 iconCode 和 text，并更新
         async function getWeather() {
             const apiKey = 'e72e4309ce714a289b8908415133ad69';
             const location = '101010900';
-            const apiHost = 'kw67cd4fet.re.qweatherapi.com';  // 替换为专属 Host
+            const apiHost = 'kw67cd4fet.re.qweatherapi.com';
             const url = `https://${apiHost}/v7/weather/now?location=${location}&key=${apiKey}&lang=zh&unit=m`;
 
             try {
@@ -139,8 +136,11 @@
                 const data = await res.json();
                 if (data.code === '200' && data.now) {
                     const code = data.now.icon;  // e.g. '305'
+                    const text = data.now.text;  // e.g. '小雨'
                     const iconEl = document.getElementById('weather-icon');
+                    const textEl = document.getElementById('weather-text');
                     iconEl.className = `weather-icon qi-${code}`;
+                    textEl.textContent = text;
                 } else {
                     console.error('和风天气 API 返回异常：', data);
                 }
@@ -150,7 +150,6 @@
         }
 
         dateTime();
-        // 首次获取并定时每小时刷新
         getWeather();
         setInterval(getWeather, 3600000);
     </script>
