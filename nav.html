@@ -9,9 +9,18 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&display=swap" rel="stylesheet">
 
-	<!-------->
-
 	<style>
+		/* 使页面占满视口并使用 Flex 实现上下左右居中 */
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		body {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
 		* {
 			margin: 0;
 			padding: 0;
@@ -25,7 +34,8 @@
 			font-weight: 400;
 			font-style: normal;
 			padding: 8px;
-			text-align: center;
+			/* 去除原有 margin，使 Flex 居中生效 */
+			margin: 0;
 			width: fit-content;
 		}
 
@@ -35,7 +45,9 @@
 			text-transform: uppercase;
 			display: inline-block;
 			padding: 6px;
-			margin: 0 60px;
+			/* 左右间距 */
+			margin: 0 30px;
+			/* 字体大小 */
 			font-size: 18px;
 		}
 
@@ -92,7 +104,6 @@
 			else if (id == 'work')
 				url = "https://www.notion.so/1672e5733eb880c08314caa6f82bdea8";
 
-			// 使用顶层窗口进行跳转，确保整个页面跳转而不是嵌入模块跳转
 			top.location.href = url;
 		}
 	</script>
