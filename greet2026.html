@@ -16,32 +16,30 @@
     <style>
         /*CSS RESETS*/
         body{
-            background-color: transparent; /* 页面背景透明（未更动） */
+            background-color: transparent; /* 页面背景透明（保持） */
             line-height: 1.6;
         }
         h1 { margin-top: 0; }
         .full-table { display: table; height: 100%; width: 100%; }
         .table-cell { display: table-cell; vertical-align: middle; text-align: center; }
 
-        /* ---------- 仅修改的 .card 样式（按你要求：旋转 180° 的视觉效果 + 缩小半径 + 弧线与上下线同粗） ---------- */
+        /* ---------- .card（已按要求改动：删除左下弧；弧与线同粗；保持无阴影；弧仍为“旋转180°”视觉实现） ---------- */
         .card {
             padding: 10px 25px;
             border-radius: 10px;
-            background: transparent; /* 卡片背景透明 */
+            background: transparent;
             width: 95vw;
-            color: #b58ed4; /* 字体颜色保持为你指定的“当前背景颜色” (#b58ed4) */
+            color: #b58ed4;
             display: inline-block;
-            position: relative; /* 为伪元素定位建立上下文 */
-
-            /* 去掉阴影（你之前要求） */
+            position: relative;
             box-shadow: none;
 
-            /* ---- 参数：弧半径与弧/线粗细 ---- */
-            --arc-radius: 28px;      /* 已缩小半径（你要求“缩小一点”） */
-            --arc-thickness: 2px;    /* 弧与上下线的粗细（保持一致） */
+            /* 参数：弧半径与弧/线粗细（统一控制） */
+            --arc-radius: 24px;       /* 我把半径再缩小一点（如果你想要其他数值告诉我） */
+            --arc-thickness: 2px;     /* 弧与上下线的粗细（统一） */
 
             background-repeat: no-repeat;
-            /* 背景位置仍然是四角（顺序：左上、右上、左下、右下） */
+            /* 背景位置顺序： left top, right top, left bottom, right bottom */
             background-position: left top, right top, left bottom, right bottom;
             background-size: calc(var(--arc-radius)) calc(var(--arc-radius)),
                              calc(var(--arc-radius)) calc(var(--arc-radius)),
@@ -49,34 +47,28 @@
                              calc(var(--arc-radius)) calc(var(--arc-radius));
 
             /* 
-               为实现“每个四分之一圆旋转180°”的视觉效果：
-               - 我把用于绘制左上弧的 radial-gradient 的 center 指向（对角）右下，
-                 同理把右上指向左下，左下指向右上，右下指向左上。
-               - 这样每个角显示的弧相对于之前的状态会被“翻转”180°（视觉上等同于整个四分之一圆旋转）。
+               左上 / 右上 / 左下 / 右下 的定义：
+               - 已把左下的项置为 none（即移除左下四分之一圆）。
+               - 其它角仍保留我们之前用于“旋转180°”的对角中心策略。
             */
             background-image:
-                /* 左上角显示旋转后的（使用对角中心 right bottom） */
+                /* 左上角（使用对角 right bottom 达到旋转 180° 视觉） */
                 radial-gradient(circle at right bottom,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 var(--arc-radius),
                     transparent var(--arc-radius)
                 ),
-                /* 右上角：使用对角 center left bottom */
+                /* 右上角（使用对角 left bottom） */
                 radial-gradient(circle at left bottom,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 var(--arc-radius),
                     transparent var(--arc-radius)
                 ),
-                /* 左下角：使用对角 center right top */
-                radial-gradient(circle at right top,
-                    transparent calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 var(--arc-radius),
-                    transparent var(--arc-radius)
-                ),
-                /* 右下角：使用对角 center left top */
+                /* 左下角：移除（none） */
+                none,
+                /* 右下角（使用对角 left top） */
                 radial-gradient(circle at left top,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
@@ -85,7 +77,7 @@
                 );
         }
 
-        /* ---------- 上下水平线（只连顶部/底部两圆顶点，粗细与圆弧一致） ---------- */
+        /* ---------- 上下水平线：点-短横重复样式（粗细与圆弧一致），并从左右弧顶点处开始/结束 ---------- */
         .card::before,
         .card::after {
             content: "";
@@ -93,24 +85,35 @@
             left: var(--arc-radius);
             right: var(--arc-radius);
             height: var(--arc-thickness);  /* 与弧的粗细一致 */
-            background: #b58ed4;           /* 与弧线颜色一致 */
             pointer-events: none;
             z-index: 0;
+
+            /* 使用 repeating-linear-gradient 构造：点（短段） + 空白 + 短横（较长段） + 空白，循环 */
+            background-image: repeating-linear-gradient(to right,
+                /* 点（短段） */
+                #b58ed4 0px 2px,
+                /* 间隔 */
+                transparent 2px 6px,
+                /* 短横（比点长） */
+                #b58ed4 6px 12px,
+                /* 下一个间隔 */
+                transparent 12px 16px
+            );
+            background-repeat: repeat-x;
         }
         .card::before { top: 0; }    /* 顶部横线 */
         .card::after  { bottom: 0; } /* 底部横线 */
 
-        /* 确保卡片内部文字/图标在伪元素之上显示（未更动结构，仅用层级） */
+        /* 确保卡片内部文字/图标在伪元素之上显示 */
         .card > * { position: relative; z-index: 1; }
 
-        /* ---------- 其余样式（保留原样，仅继承/展示） ---------- */
+        /* ---------- 其余样式（未改动逻辑，仅展示） ---------- */
         .greet{
             display:inline;
             font-family:  "Yesteryear", cursive;
             font-size: 3rem;
             padding-right: 30px;
         }
-        /* 使用图标字体 */
         .weather-icon {
             display: inline-block;
             width: 50px;
@@ -120,9 +123,8 @@
             vertical-align: middle;
             transform: translateY(-10px);
             margin-right: 8px;
-            /* 图标颜色会继承 .card 的 color (#b58ed4) */
+            /* 颜色继承 .card color */
         }
-        /* 天气描述文字 */
         .weather-text {
             display: inline-block;
             font-family: "ZCOOL KuaiLe", sans-serif;
