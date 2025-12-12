@@ -6,9 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Yesteryear&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <!-- 引入和风天气图标字体 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/qweather-icons@1.6.0/font/qweather-icons.css">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>greeting2</title>
@@ -16,14 +14,14 @@
     <style>
         /*CSS RESETS*/
         body{
-            background-color: transparent; /* 页面背景透明（保持） */
+            background-color: transparent;
             line-height: 1.6;
         }
         h1 { margin-top: 0; }
         .full-table { display: table; height: 100%; width: 100%; }
         .table-cell { display: table-cell; vertical-align: middle; text-align: center; }
 
-        /* ---------- .card（已按要求改动：删除左下弧；弧与线同粗；保持无阴影；弧仍为“旋转180°”视觉实现） ---------- */
+        /* ---------- .card：四分之一圆、上下点横线、粗细等（含可修改注释） ---------- */
         .card {
             padding: 10px 25px;
             border-radius: 10px;
@@ -34,41 +32,46 @@
             position: relative;
             box-shadow: none;
 
-            /* 参数：弧半径与弧/线粗细（统一控制） */
-            --arc-radius: 24px;       /* 我把半径再缩小一点（如果你想要其他数值告诉我） */
-            --arc-thickness: 2px;     /* 弧与上下线的粗细（统一） */
+            /* === 以下是你要修改的主要参数（调整视觉：半径 / 粗细） === */
+            /* --arc-radius: 四分之一圆的半径（px）。示例：24px / 28px / 36px */
+            /* --arc-thickness: 圆弧与上下线的粗细（px），两个会同步。示例：2px / 3px / 4px */
+            --arc-radius: 24px;       /* === 可修改（圆弧大小决定上下线两端的间距） === */
+            --arc-thickness: 3px;     /* === 可修改（同时控制弧和线的粗细） === */
 
             background-repeat: no-repeat;
-            /* 背景位置顺序： left top, right top, left bottom, right bottom */
             background-position: left top, right top, left bottom, right bottom;
             background-size: calc(var(--arc-radius)) calc(var(--arc-radius)),
                              calc(var(--arc-radius)) calc(var(--arc-radius)),
                              calc(var(--arc-radius)) calc(var(--arc-radius)),
                              calc(var(--arc-radius)) calc(var(--arc-radius));
 
-            /* 
-               左上 / 右上 / 左下 / 右下 的定义：
-               - 已把左下的项置为 none（即移除左下四分之一圆）。
-               - 其它角仍保留我们之前用于“旋转180°”的对角中心策略。
+            /* background-image：四个角的定义（顺序：左上、右上、左下、右下）
+               我已把左下恢复为 radial-gradient（即左下的四分之一圆已恢复）。
+               注意：颜色 #b58ed4 为你当前字体/弧颜色，如需改色请统一替换该值。
             */
             background-image:
-                /* 左上角（使用对角 right bottom 达到旋转 180° 视觉） */
+                /* 左上（旋转视觉实现：中心对角） */
                 radial-gradient(circle at right bottom,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 var(--arc-radius),
                     transparent var(--arc-radius)
                 ),
-                /* 右上角（使用对角 left bottom） */
+                /* 右上 */
                 radial-gradient(circle at left bottom,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 var(--arc-radius),
                     transparent var(--arc-radius)
                 ),
-                /* 左下角：移除（none） */
-                none,
-                /* 右下角（使用对角 left top） */
+                /* 左下（已恢复） */
+                radial-gradient(circle at right top,
+                    transparent calc(var(--arc-radius) - var(--arc-thickness)),
+                    #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
+                    #b58ed4 var(--arc-radius),
+                    transparent var(--arc-radius)
+                ),
+                /* 右下 */
                 radial-gradient(circle at left top,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
@@ -77,37 +80,45 @@
                 );
         }
 
-        /* ---------- 上下水平线：点-短横重复样式（粗细与圆弧一致），并从左右弧顶点处开始/结束 ---------- */
+        /* ---------- 上下水平线（点-短横重复图案） ---------- */
         .card::before,
         .card::after {
             content: "";
             position: absolute;
-            left: var(--arc-radius);
-            right: var(--arc-radius);
-            height: var(--arc-thickness);  /* 与弧的粗细一致 */
+            left: var(--arc-radius);   /* 从左弧顶点开始 */
+            right: var(--arc-radius);  /* 在右弧顶点结束 */
+            height: var(--arc-thickness);  /* === 与圆弧粗细同步（若想改粗细，就改 --arc-thickness） === */
             pointer-events: none;
             z-index: 0;
 
-            /* 使用 repeating-linear-gradient 构造：点（短段） + 空白 + 短横（较长段） + 空白，循环 */
+            /* === 下面这行就是“点-短横”图案的定义（修改这里可以改变点/段长度与间隔） ===
+               repeating-linear-gradient(to right,
+                 #b58ed4 0px 2px,        -> 点（实际为连续实色段）长度为 2px
+                 transparent 2px 6px,    -> 点后的空白长度为 4px（2->6）
+                 #b58ed4 6px 12px,       -> 短横长度为 6px (6->12)
+                 transparent 12px 16px   -> 短横后的空白长度为 4px (12->16)
+               );
+               若想改“点更大/更小”或“短横更长/更短”，只需调整这些数值（下面给出示例）。
+            */
             background-image: repeating-linear-gradient(to right,
-                /* 点（短段） */
+                /* === 可修改：点长度（当前 2px） === */
                 #b58ed4 0px 2px,
-                /* 间隔 */
+                /* === 可修改：点到短横之间的间隔（当前 4px: 2px→6px） === */
                 transparent 2px 6px,
-                /* 短横（比点长） */
+                /* === 可修改：短横长度（当前 6px: 6px→12px） === */
                 #b58ed4 6px 12px,
-                /* 下一个间隔 */
+                /* === 可修改：短横后的间隔（当前 4px: 12px→16px） === */
                 transparent 12px 16px
             );
             background-repeat: repeat-x;
         }
-        .card::before { top: 0; }    /* 顶部横线 */
-        .card::after  { bottom: 0; } /* 底部横线 */
+        .card::before { top: 0; }
+        .card::after  { bottom: 0; }
 
         /* 确保卡片内部文字/图标在伪元素之上显示 */
         .card > * { position: relative; z-index: 1; }
 
-        /* ---------- 其余样式（未改动逻辑，仅展示） ---------- */
+        /* ---------- 其余样式（保留不变） ---------- */
         .greet{
             display:inline;
             font-family:  "Yesteryear", cursive;
@@ -123,7 +134,6 @@
             vertical-align: middle;
             transform: translateY(-10px);
             margin-right: 8px;
-            /* 颜色继承 .card color */
         }
         .weather-text {
             display: inline-block;
@@ -155,7 +165,6 @@
       <div class="table-cell">
         <div class="card">
             <div class="greet" id="greet"></div>
-            <!-- 图标和文字描述 -->
             <i id="weather-icon" class="weather-icon qi-100"></i>
             <span id="weather-text" class="weather-text"></span>
             <div class="date-container" id="date"></div>
@@ -200,7 +209,6 @@
 
         function dateTime() { date(); clock(); setTimeout(dateTime, 500); }
 
-        // 调用和风天气 API 获取 iconCode 和 text，并更新
         async function getWeather() {
             const apiKey = 'e72e4309ce714a289b8908415133ad69';
             const location = '101010900';
@@ -211,8 +219,8 @@
                 const res = await fetch(url, { mode: 'cors' });
                 const data = await res.json();
                 if (data.code === '200' && data.now) {
-                    const code = data.now.icon;  // e.g. '305'
-                    const text = data.now.text;  // e.g. '小雨'
+                    const code = data.now.icon;
+                    const text = data.now.text;
                     const iconEl = document.getElementById('weather-icon');
                     const textEl = document.getElementById('weather-text');
                     iconEl.className = `weather-icon qi-${code}`;
