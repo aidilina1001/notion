@@ -23,7 +23,7 @@
         .full-table { display: table; height: 100%; width: 100%; }
         .table-cell { display: table-cell; vertical-align: middle; text-align: center; }
 
-        /* ---------- 仅修改的 .card 样式（包含：角弧方向、去阴影、上下线与弧粗细一致） ---------- */
+        /* ---------- 仅修改的 .card 样式（按你要求：旋转 180° 的视觉效果 + 缩小半径 + 弧线与上下线同粗） ---------- */
         .card {
             padding: 10px 25px;
             border-radius: 10px;
@@ -33,190 +33,50 @@
             display: inline-block;
             position: relative; /* 为伪元素定位建立上下文 */
 
-            /* 去掉阴影（你要求去掉） */
+            /* 去掉阴影（你之前要求） */
             box-shadow: none;
 
             /* ---- 参数：弧半径与弧/线粗细 ---- */
-            --arc-radius: 36px;       /* 圆弧半径（可以调整） */
-            --arc-thickness: 2px;     /* 圆弧与上下线的粗细（统一） */
+            --arc-radius: 28px;      /* 已缩小半径（你要求“缩小一点”） */
+            --arc-thickness: 2px;    /* 弧与上下线的粗细（保持一致） */
 
             background-repeat: no-repeat;
-            /* 明确指定在四个角放置四个 radial-gradient（顺序：左上、右上、左下、右下） */
+            /* 背景位置仍然是四角（顺序：左上、右上、左下、右下） */
             background-position: left top, right top, left bottom, right bottom;
             background-size: calc(var(--arc-radius)) calc(var(--arc-radius)),
                              calc(var(--arc-radius)) calc(var(--arc-radius)),
                              calc(var(--arc-radius)) calc(var(--arc-radius)),
                              calc(var(--arc-radius)) calc(var(--arc-radius));
 
-            /* 使用关键字形式定位，避免坐标/偏移导致的方向颠倒 */
+            /* 
+               为实现“每个四分之一圆旋转180°”的视觉效果：
+               - 我把用于绘制左上弧的 radial-gradient 的 center 指向（对角）右下，
+                 同理把右上指向左下，左下指向右上，右下指向左上。
+               - 这样每个角显示的弧相对于之前的状态会被“翻转”180°（视觉上等同于整个四分之一圆旋转）。
+            */
             background-image:
-                radial-gradient(circle at left top,
+                /* 左上角显示旋转后的（使用对角中心 right bottom） */
+                radial-gradient(circle at right bottom,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 var(--arc-radius),
                     transparent var(--arc-radius)
                 ),
-                radial-gradient(circle at right top,
-                    transparent calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 var(--arc-radius),
-                    transparent var(--arc-radius)
-                ),
+                /* 右上角：使用对角 center left bottom */
                 radial-gradient(circle at left bottom,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 var(--arc-radius),
                     transparent var(--arc-radius)
                 ),
-                radial-gradient(circle at right bottom,
+                /* 左下角：使用对角 center right top */
+                radial-gradient(circle at right top,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
                     #b58ed4 var(--arc-radius),
                     transparent var(--arc-radius)
-                );
-        }
-
-        /* ---------- 上下水平线（只连顶部/底部两圆顶点，粗细与圆弧一致） ---------- */
-        .card::before,
-        .card::after {
-            content: "";
-            position: absolute;
-            left: var(--arc-radius);
-            right: var(--arc-radius);
-            height: var(--arc-thickness);  /* 与弧的粗细一致 */
-            background: #b58ed4;           /* 与弧线颜色一致 */
-            pointer-events: none;
-            z-index: 0;
-        }
-        .card::before { top: 0; }    /* 顶部横线 */
-        .card::after  { bottom: 0; } /* 底部横线 */
-
-        /* 确保卡片内部文字/图标在伪元素之上显示（未更动结构，仅用层级） */
-        .card > * { position: relative; z-index: 1; }
-
-        /* ---------- 其余样式（保留原样，仅继承/展示） ---------- */
-        .greet{
-            display:inline;
-            font-family:  "Yesteryear", cursive;
-            font-size: 3rem;
-            padding-right: 30px;
-        }
-        /* 使用图标字体 */
-        .weather-icon {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            font-size: 50px;
-            line-height: 1;
-            vertical-align: middle;
-            transform: translateY(-10px);
-            margin-right: 8px;
-            /* 图标颜色会继承 .card 的 color (#b58ed4) */
-        }
-        /* 天气描述文字 */
-        .weather-text {
-            display: inline-block;
-            font-family: "ZCOOL KuaiLe", sans-serif;
-            font-size: 1.5em;
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-        .date-container {
-            display: inline;
-            font-family: "Sour Gummy", sans-serif;
-            font-size: 2em;
-            padding-right: 30px;
-        }
-        .weekday { font-size: 0.7em; padding-left: 5px; }
-        .clock {
-            display: inline;
-            font-family: "Sour Gummy", sans-serif;
-            font-size: 2em;
-        }
-        .time { display: inline; min-width: 37px; }
-        .colon { font-size: 1.1em; display: inline-block; }
-    </style>
-</head>
-<body>
-    <link href="https://fonts.googleapis.com/css?family=Lobster|Roboto:400,700" rel="stylesheet">
-
-    <div class="full-table">
-      <div class="table-cell">
-        <div class="card">
-            <div class="greet" id="greet"></div>
-            <!-- 图标和文字描述 -->
-            <i id="weather-icon" class="weather-icon qi-100"></i>
-            <span id="weather-text" class="weather-text"></span>
-            <div class="date-container" id="date"></div>
-          <div class="clock">
-            <div class="time" id="hour"></div>
-            <div class="colon">:</div>
-            <div class="time" id="min"></div>
-            <div class="colon">:</div>
-            <div class="time" id="sec"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <script>
-        function date() {
-            var today = new Date();
-            var options = { weekday: 'short' };
-            var weekday = new Intl.DateTimeFormat('en-US', options).format(today);
-            var formattedDate = today.toLocaleString('en-US', { month: 'short' }) + ' ' + today.getDate() + ', ' + today.getFullYear();
-            document.getElementById('date').innerHTML = formattedDate + ' <span class="weekday">' + weekday + '</span>';
-        }
-
-        function clock() {
-            var today = new Date();
-            var hour = zeros(today.getHours());
-            var minutes = zeros(today.getMinutes());
-            var seconds = zeros(today.getSeconds());
-            var hrs = today.getHours();
-            var greet;
-            if (hrs >=6 && hrs < 12) greet = 'Good Morning';
-            else if (hrs >= 12 && hrs < 18) greet = 'Good Afternoon';
-            else if (hrs >=18 && hrs <24) greet = 'Good Evening';
-            else greet = 'Good Night';
-            document.getElementById('greet').innerHTML = greet;
-            document.getElementById('hour').innerHTML = hour;
-            document.getElementById('min').innerHTML = minutes;
-            document.getElementById('sec').innerHTML = seconds;
-        }
-
-        function zeros(num) { return num < 10 ? '0' + num : num; }
-
-        function dateTime() { date(); clock(); setTimeout(dateTime, 500); }
-
-        // 调用和风天气 API 获取 iconCode 和 text，并更新
-        async function getWeather() {
-            const apiKey = 'e72e4309ce714a289b8908415133ad69';
-            const location = '101010900';
-            const apiHost = 'kw67cd4fet.re.qweatherapi.com';
-            const url = `https://${apiHost}/v7/weather/now?location=${location}&key=${apiKey}&lang=zh&unit=m`;
-
-            try {
-                const res = await fetch(url, { mode: 'cors' });
-                const data = await res.json();
-                if (data.code === '200' && data.now) {
-                    const code = data.now.icon;  // e.g. '305'
-                    const text = data.now.text;  // e.g. '小雨'
-                    const iconEl = document.getElementById('weather-icon');
-                    const textEl = document.getElementById('weather-text');
-                    iconEl.className = `weather-icon qi-${code}`;
-                    textEl.textContent = text;
-                } else {
-                    console.error('和风天气 API 返回异常：', data);
-                }
-            } catch (e) {
-                console.error('获取天气失败：', e);
-            }
-        }
-
-        dateTime();
-        getWeather();
-        setInterval(getWeather, 3600000);
-    </script>
-</body>
-</html>
+                ),
+                /* 右下角：使用对角 center left top */
+                radial-gradient(circle at left top,
+                    transparent calc(var(--arc-radius) - var(--arc-thickness)),
+                    #b58ed4 calc(var(--arc-radiu
