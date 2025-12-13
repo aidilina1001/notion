@@ -27,7 +27,7 @@
             border-radius: 10px;
             background: transparent;
             width: 95vw;
-            color: #b58ed4;
+            color: #4f936d; /* 字体颜色已改为 #4f936d（你要求的文字颜色） */
             display: inline-block;
             position: relative;
             box-shadow: none;
@@ -46,36 +46,35 @@
                              calc(var(--arc-radius)) calc(var(--arc-radius));
 
             /* background-image：四个角的定义（顺序：左上、右上、左下、右下）
-               我已把左下恢复为 radial-gradient（即左下的四分之一圆已恢复）。
-               注意：颜色 #b58ed4 为你当前字体/弧颜色，如需改色请统一替换该值。
+               四分之一圆颜色（边框颜色）已改为 #e8f1ec。
             */
             background-image:
                 /* 左上（旋转视觉实现：中心对角） */
                 radial-gradient(circle at right bottom,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 var(--arc-radius),
+                    #e8f1ec calc(var(--arc-radius) - var(--arc-thickness)),
+                    #e8f1ec var(--arc-radius),
                     transparent var(--arc-radius)
                 ),
                 /* 右上 */
                 radial-gradient(circle at left bottom,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 var(--arc-radius),
+                    #e8f1ec calc(var(--arc-radius) - var(--arc-thickness)),
+                    #e8f1ec var(--arc-radius),
                     transparent var(--arc-radius)
                 ),
                 /* 左下（已恢复） */
                 radial-gradient(circle at right top,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 var(--arc-radius),
+                    #e8f1ec calc(var(--arc-radius) - var(--arc-thickness)),
+                    #e8f1ec var(--arc-radius),
                     transparent var(--arc-radius)
                 ),
                 /* 右下 */
                 radial-gradient(circle at left top,
                     transparent calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 calc(var(--arc-radius) - var(--arc-thickness)),
-                    #b58ed4 var(--arc-radius),
+                    #e8f1ec calc(var(--arc-radius) - var(--arc-thickness)),
+                    #e8f1ec var(--arc-radius),
                     transparent var(--arc-radius)
                 );
         }
@@ -91,23 +90,15 @@
             pointer-events: none;
             z-index: 0;
 
-            /* === 下面这行就是“点-短横”图案的定义（修改这里可以改变点/段长度与间隔） ===
-               repeating-linear-gradient(to right,
-                 #b58ed4 0px 2px,        -> 点（实际为连续实色段）长度为 2px
-                 transparent 2px 6px,    -> 点后的空白长度为 4px（2->6）
-                 #b58ed4 6px 12px,       -> 短横长度为 6px (6->12)
-                 transparent 12px 16px   -> 短横后的空白长度为 4px (12->16)
-               );
-               若想改“点更大/更小”或“短横更长/更短”，只需调整这些数值（下面给出示例）。
-            */
+            /* repeating-linear-gradient 中所使用的颜色已改为 #e8f1ec（边框颜色） */
             background-image: repeating-linear-gradient(to right,
-                /* === 可修改：点长度（当前 2px） === */
-                #b58ed4 0px 2px,
-                /* === 可修改：点到短横之间的间隔（当前 4px: 2px→6px） === */
+                /* 点长度（当前 2px） */
+                #e8f1ec 0px 2px,
+                /* 点后空白（当前 4px: 2->6） */
                 transparent 2px 6px,
-                /* === 可修改：短横长度（当前 6px: 6px→12px） === */
-                #b58ed4 6px 12px,
-                /* === 可修改：短横后的间隔（当前 4px: 12px→16px） === */
+                /* 短横长度（当前 6px: 6->12） */
+                #e8f1ec 6px 12px,
+                /* 短横后的空白（当前 4px: 12->16） */
                 transparent 12px 16px
             );
             background-repeat: repeat-x;
@@ -124,6 +115,7 @@
             font-family:  "Yesteryear", cursive;
             font-size: 3rem;
             padding-right: 30px;
+            /* 字体颜色继承自 .card（#4f936d） */
         }
         .weather-icon {
             display: inline-block;
@@ -134,6 +126,7 @@
             vertical-align: middle;
             transform: translateY(-10px);
             margin-right: 8px;
+            /* 图标颜色继承 .card 的 color（#4f936d） */
         }
         .weather-text {
             display: inline-block;
@@ -141,18 +134,21 @@
             font-size: 1.5em;
             vertical-align: middle;
             margin-right: 10px;
+            /* 颜色继承自 .card（#4f936d） */
         }
         .date-container {
             display: inline;
             font-family: "Sour Gummy", sans-serif;
             font-size: 2em;
             padding-right: 30px;
+            /* 颜色继承自 .card（#4f936d） */
         }
         .weekday { font-size: 0.7em; padding-left: 5px; }
         .clock {
             display: inline;
             font-family: "Sour Gummy", sans-serif;
             font-size: 2em;
+            /* 颜色继承自 .card（#4f936d） */
         }
         .time { display: inline; min-width: 37px; }
         .colon { font-size: 1.1em; display: inline-block; }
