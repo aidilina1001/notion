@@ -10,24 +10,13 @@
 	<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&display=swap" rel="stylesheet">
 
 	<style>
-		/* 使页面占满视口并使用 Flex 实现上下左右居中 */
-		html, body {
-			height: 100%;
-			margin: 0;
-		}
-		body {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
+		/* 基本重置 - 未更改逻辑 */
+		html, body { height: 100%; margin: 0; }
+		body { display: flex; justify-content: center; align-items: center; }
 
-		* {
-			margin: 0;
-			padding: 0;
-			-webkit-box-sizing: border-box;
-			box-sizing: border-box;
-		}
+		* { margin: 0; padding: 0; box-sizing: border-box; }
 
+		/* ========== 导航容器 ========== */
 		.navMenu {
 			font-family: "Noto Serif SC", serif;
 			font-optical-sizing: auto;
@@ -36,31 +25,97 @@
 			padding: 8px;
 			margin: 0;
 
-			/* === MODIFIED ===
-			   关键可调变量：--nav-gap 控制 item 之间的 gap（clamp: min, preferred, max）
-			   我把最大值提高，且让容器在大屏时不被 1200px 限制。
-			   你可以按需调整 clamp() 的三个数值来设置最小/首选/最大间距。
-			*/
-			--nav-gap: clamp(28px, 6vw, 240px);  /* === MODIFIED === （min, preferred, max） */
+			/* === 你可以调整的变量（保持此前设定） === */
+			--nav-gap: clamp(28px, 6vw, 240px);  /* 控制最大/首选/最小间距 */
+			--arc-radius: 24px;                  /* 四分之一圆半径（控制弧大小与上下线起止） */
+			--arc-thickness: 3px;                /* 圆弧与上下线粗细（两者一致） */
+			--stroke-color: #e8f1ec;             /* 边框颜色（弧 + 点横 + hover） */
 
-			/* === MODIFIED ===
-			   布局：平均分配每个 item 宽度并使用 gap 控制间距；
-			   width: 使用 95% 而不是 min(...,1200px)，以便在全屏时可以扩大间距。
-			*/
+			/* 布局（保持每项平均分配，且间距随宽度） */
 			display: flex;
 			flex-wrap: nowrap;
 			justify-content: space-between;
 			align-items: center;
-			gap: var(--nav-gap);         /* === MODIFIED === 让 gap 随视口缩放 */
-			width: 95%;                 /* === MODIFIED === 容器在大屏会更宽（而不是限制为 1200px） */
-			max-width: none;            /* === MODIFIED === 确保不被上限限制 */
+			gap: var(--nav-gap);
+			width: 95%;
+			max-width: none;
+			position: relative; /* === RESTORED / MODIFIED === 用于伪元素定位 */
+
+			/* === RESTORED / MODIFIED ===
+			   在容器背景上绘制四角四分之一圆（使用 radial-gradient）。
+			   说明：顺序为 left top, right top, left bottom, right bottom。
+			*/
+			background-repeat: no-repeat;
+			background-position: left top, right top, left bottom, right bottom;
+			background-size: var(--arc-radius) var(--arc-radius),
+			                 var(--arc-radius) var(--arc-radius),
+			                 var(--arc-radius) var(--arc-radius),
+			                 var(--arc-radius) var(--arc-radius);
+
+			background-image:
+				/* 左上角（定位为对角以保持和之前一致的“弧向”） */
+				radial-gradient(circle at right bottom,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				),
+				/* 右上角 */
+				radial-gradient(circle at left bottom,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				),
+				/* 左下角 */
+				radial-gradient(circle at right top,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				),
+				/* 右下角 */
+				radial-gradient(circle at left top,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				);
 		}
 
-		/* === MODIFIED ===
-		   保持每项平均分配宽度（flex:1），但 gap 会在大屏呈现更大的空隙。
-		*/
+		/* ========== 上下点-短横（伪元素） ========== */
+		.navMenu::before,
+		.navMenu::after {
+			content: "";
+			position: absolute;
+			left: var(--arc-radius);    /* 从弧顶点开始 */
+			right: var(--arc-radius);   /* 在右弧顶点结束 */
+			height: var(--arc-thickness); /* 与弧粗细一致 */
+			pointer-events: none;
+			z-index: 0; /* 放在内容下面 */
+
+			/* === RESTORED / MODIFIED ===
+			   点-短横图案（颜色使用 --stroke-color）
+			   可调整 stop 值来改变点/短横的长度与间隔：
+			     格式：color start end, transparent start end, ...
+			*/
+			background-image: repeating-linear-gradient(to right,
+				var(--stroke-color) 0px 3px,    /* 点长度（示例：3px） */
+				transparent 3px 7px,            /* 点后空白（4px） */
+				var(--stroke-color) 7px 20px,   /* 短横长度（示例：13px） */
+				transparent 20px 26px           /* 短横后空白（示例：6px） */
+			);
+			background-repeat: repeat-x;
+		}
+		.navMenu::before { top: 0; }
+		.navMenu::after  { bottom: 0; }
+
+		/* 保证内容在伪元素之上显示（必要） */
+		.navMenu > * { position: relative; z-index: 1; }
+
+		/* ========== 链接样式（颜色/布局） ========== */
 		.navMenu a {
-			color: #4f936d;
+			color: #4f936d;           /* 主文字颜色（你要求） */
 			text-decoration: none;
 			text-transform: uppercase;
 			display: inline-block;
@@ -68,68 +123,23 @@
 			margin: 0;
 			font-size: 18px;
 
+			/* 保持平均分配行为 */
 			flex: 1 1 0;
 			min-width: 0;
 			text-align: center;
 			white-space: nowrap;
 		}
 
-		.background {
-			background-color: #ece5f0;
-		}
+		/* 悬停颜色与边框颜色一致（你要求） */
+		.navMenu a:hover { color: var(--stroke-color); }
 
-		.border {
-			border: 0px solid #cccccc;
-		}
-
-		.navMenu a:hover {
-			color: #e8f1ec;
-		}
+		/* 其他保留的类（未改） */
+		.background { background-color: #ece5f0; }
+		.border { border: 0px solid #cccccc; }
 	</style>
 </head>
 
 <body>
 
 	<nav class="navMenu border">
-		<a id="home" onclick="navigate(this.id)" href="#"> <i class="fa-solid fa-house"></i> 返回主页</a>
-		<a id="target" onclick="navigate(this.id)" href="#"> <i class="fa-sharp-duotone fa-solid fa-bullseye"></i> 任务日志</a>
-		<a id="movement" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-list-check"></i> 行动管理</a>
-		<a id="backpack" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-bag-shopping"></i> 我的背包</a>
-		<a id="friend" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-people-robbery"></i> 人际关系</a>
-		<a id="record" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-atom"></i> 人生记录</a>
-		<a id="work" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-comments"></i> 创意工坊</a>
-	</nav>
-
-	<script>
-		let direction = "horizontal";
-		if (direction === "vertical") {
-			document.head.insertAdjacentHTML("beforeend", `<style>
-			.navMenu a {display: block; text-align:left; margin:7px}
-			i {width:15px; margin-right:5px}
-			.navMenu {margin:3px}
-			</style>`);
-		}
-
-		function navigate(id) {
-			let url = "";
-			if (id == 'home')
-				url = "https://www.notion.so/Diane-s-2025-1662e5733eb8806ebf32da507b9bb863";
-			else if (id == 'target')
-				url = "https://www.notion.so/1672e5733eb8802489d8d447882e8d66";
-			else if (id == 'movement')
-				url = "https://www.notion.so/1672e5733eb8801ab9e9fcaa1bb4ad6d";
-			else if (id == 'backpack')
-				url = "https://www.notion.so/1672e5733eb880c2ac1edbf19db1c5cf";
-			else if (id == 'friend')
-				url = "https://www.notion.so/1672e5733eb8806bbb53fb0cccd6f8ee";
-			else if (id == 'record')
-				url = "https://www.notion.so/1672e5733eb8802d8bc0dfcde1799f3e";
-			else if (id == 'work')
-				url = "https://www.notion.so/1672e5733eb880c08314caa6f82bdea8";
-
-			top.location.href = url;
-		}
-	</script>
-
-</body>
-</html>
+		<a id="home
