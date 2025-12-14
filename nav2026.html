@@ -38,28 +38,26 @@
 			margin: 0;
 
 			/* === MODIFIED ===
-			   为了让链接间距随页面宽度自适应，我把 navMenu 改为 flex 布局并添加了 gap。
-			   解释/可调项：
-			     --nav-gap: 使用 clamp(min, preferred, max) 以响应不同宽度；
-			               你可以调整 clamp 的三个数值来控制最小/首选/最大间距。
-			     width: 使用 min(95%, 1200px) 使菜单在大屏上有最大宽度限制并在小屏上保留边距。
-			     flex-wrap: 允许在窄屏上换行。
+			   控制链接间距的自适应变量（可按需调整）
 			*/
-			/* 可修改变量（举例） */
-			--nav-gap: clamp(20px, 6vw, 120px); /* === 可调整（控制间距随视口宽度变化） === */
+			--nav-gap: clamp(20px, 6vw, 120px); /* 可修改（min, preferred, max） */
 
-			/* 响应式布局设置（下列为具体实现，若需不同行为可再调整） */
+			/* === MODIFIED ===
+			   使用 flex 布局，但强制不换行，确保所有链接在同一行。
+			   overflow-x: auto 保证当总宽度超过容器时可以横向滚动（仍在同一行）。
+			*/
 			display: flex;
-			flex-wrap: wrap;                /* 窄屏时允许换行 */
-			justify-content: center;        /* 在可用宽度上居中分布链接 */
+			flex-wrap: nowrap;               /* === MODIFIED === 强制单行 */
+			justify-content: center;
 			align-items: center;
-			gap: var(--nav-gap);            /* 关键：链接之间的自适应间距 */
-			width: min(95%, 1200px);        /* 在大屏限制最大宽度，小屏留边距 */
+			gap: var(--nav-gap);             /* 关键：链接之间的自适应间距 */
+			width: min(95%, 1200px);
+			overflow-x: auto;                /* === MODIFIED === 允许横向滚动以保持单行 */
+			-webkit-overflow-scrolling: touch;
 		}
 
 		/* === MODIFIED ===
-		   删除固定左右 margin，改为由 flex gap 控制间距。
-		   若你希望每个链接左右仍保留微小内边距，可调整 padding。
+		   取消固定 margin，并确保链接内文字不换行（保证单行显示）
 		*/
 		.navMenu a {
 			color: #272727;
@@ -67,9 +65,9 @@
 			text-transform: uppercase;
 			display: inline-block;
 			padding: 6px;
-			margin: 0;          /* === MODIFIED ===（已移除原先 margin: 0 60px） */
+			margin: 0;          /* === MODIFIED === */
 			font-size: 18px;
-			white-space: nowrap; /* 防止单个链接内部换行（可按需去掉） */
+			white-space: nowrap; /* === MODIFIED === 防止链接内部换行 */
 		}
 
 		.background {
@@ -81,11 +79,16 @@
 		}
 
 		/* === MODIFIED ===
-		   悬停颜色改为 #4f936d（你要求的颜色）
+		   悬停颜色改为你要求的 #4f936d（保持此前改动）
 		*/
 		.navMenu a:hover {
 			color: #4f936d;   /* === MODIFIED === */
 		}
+
+		/* 可选： 隐藏横向滚动条（若你不想看到滚动条，取消注释下面两行）
+		.navMenu::-webkit-scrollbar { display: none; }
+		.navMenu { -ms-overflow-style: none; scrollbar-width: none; }
+		*/
 	</style>
 </head>
 
@@ -114,19 +117,19 @@
 		function navigate(id) {
 			let url = "";
 			if (id == 'home')
-				url = "https://www.notion.so/Diane-s-2026-2c62e5733eb880c0b382dfc22790cce8";
+				url = "https://www.notion.so/Diane-s-2025-1662e5733eb8806ebf32da507b9bb863";
 			else if (id == 'target')
-				url = "https://www.notion.so/2c62e5733eb881fd8a58f6c7fbf0562a";
+				url = "https://www.notion.so/1672e5733eb8802489d8d447882e8d66";
 			else if (id == 'movement')
-				url = "https://www.notion.so/2c62e5733eb881c3b4d9ea81a013ade2";
+				url = "https://www.notion.so/1672e5733eb8801ab9e9fcaa1bb4ad6d";
 			else if (id == 'backpack')
-				url = "https://www.notion.so/2c62e5733eb8816cbfbadbaaab904ce8";
+				url = "https://www.notion.so/1672e5733eb880c2ac1edbf19db1c5cf";
 			else if (id == 'friend')
-				url = "https://www.notion.so/2c62e5733eb881f98190db0b4f4d05c2";
+				url = "https://www.notion.so/1672e5733eb8806bbb53fb0cccd6f8ee";
 			else if (id == 'record')
-				url = "https://www.notion.so/2c62e5733eb8814fb5f9f377c0cc103a";
+				url = "https://www.notion.so/1672e5733eb8802d8bc0dfcde1799f3e";
 			else if (id == 'work')
-				url = "https://www.notion.so/2c62e5733eb8814a96a8eb8e0aae542a";
+				url = "https://www.notion.so/1672e5733eb880c08314caa6f82bdea8";
 
 			top.location.href = url;
 		}
