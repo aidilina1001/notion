@@ -37,23 +37,96 @@
 			margin: 0;
 
 			/* === MODIFIED ===
-			   使用 flex 布局并让每个链接平均分配可用宽度（避免横向滚动）。
-			   width: 限制最大宽度并在窄屏时占满（可调整 min/max）。
+			   为了复刻“上一个组件”的边框效果，我们在这里添加：
+			     1) arc 半径与粗细（统一控件）
+			     2) 在 navMenu 背景上绘制四个角的四分之一圆（radial-gradient）
+			     3) 保留响应式的 flex 布局（每项平分宽度）
 			*/
-			display: flex;              /* === MODIFIED === */
-			flex-wrap: nowrap;          /* === MODIFIED === 保持单行 */
+			/* === 可调参数（按需修改） === */
+			--arc-radius: 24px;       /* 四分之一圆半径，改变此值会影响角弧大小与上下线的起止位置 */
+			--arc-thickness: 3px;     /* 圆弧与上下线的粗细（二者保持一致） */
+			--stroke-color: #e8f1ec;  /* === 边框颜色（四角弧 + 上下线 + 悬停色） === */ 
+
+			/* 保持之前你满意的导航布局（每项平均分配宽度，无横向滚动） */
+			display: flex;
+			flex-wrap: nowrap;
 			justify-content: space-between;
 			align-items: center;
-			width: min(95%, 1200px);    /* 容器最大宽度，视口宽时不无限拉伸 */
-			/* 去掉 overflow-x（不再允许横向滚动） */
+			width: min(95%, 1200px);
+
+			/* === 下面是四个角的绘制（顺序：左上、右上、左下、右下）
+			   我采用之前使用的“对角 center”（可产生一致的弧线方向），并且颜色使用 --stroke-color
+			*/
+			position: relative; /* 为 ::before/::after 和背景定位创建上下文 */
+			background-repeat: no-repeat;
+			background-position: left top, right top, left bottom, right bottom;
+			background-size: var(--arc-radius) var(--arc-radius), var(--arc-radius) var(--arc-radius),
+			                 var(--arc-radius) var(--arc-radius), var(--arc-radius) var(--arc-radius);
+			background-image:
+				/* 左上角（使用对角 center 达到你先前喜欢的视觉） */
+				radial-gradient(circle at right bottom,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				),
+				/* 右上角 */
+				radial-gradient(circle at left bottom,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				),
+				/* 左下角 */
+				radial-gradient(circle at right top,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				),
+				/* 右下角 */
+				radial-gradient(circle at left top,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				);
 		}
 
 		/* === MODIFIED ===
-		   关键：使每个链接在 flex 容器中平分宽度（间距随容器变化）；
-		   text-align:center 让图标与文本居中显示；min-width:0 防止子元素溢出。
+		   在 navMenu 顶部/底部绘制点-短横重复线（只连到两侧弧的顶点）。
+		   线的左右起止由 left/right = var(--arc-radius) 控制，线的粗细与弧 thickness 相同。
+		*/
+		.navMenu::before,
+		.navMenu::after {
+			content: "";
+			position: absolute;
+			left: var(--arc-radius);
+			right: var(--arc-radius);
+			height: var(--arc-thickness);          /* === 与圆弧粗细一致 === */
+			pointer-events: none;
+			z-index: 0;
+			/* repeating pattern: 点（短） + 间隔 + 短横（长） + 间隔 */
+			background-image: repeating-linear-gradient(to right,
+				/* 点长度（可调） */    var(--stroke-color) 0px 2px,
+				/* 点后空白 */         transparent 2px 6px,
+				/* 短横长度 */         var(--stroke-color) 6px 14px,
+				/* 短横后空白 */      transparent 14px 20px
+			);
+			background-repeat: repeat-x;
+		}
+		.navMenu::before { top: 0; }
+		.navMenu::after  { bottom: 0; }
+
+		/* 保证内容在伪元素之上显示 */
+		.navMenu > * { position: relative; z-index: 1; }
+
+		/* === MODIFIED ===
+		   文字颜色、悬停颜色的修改（你要求：文字 #4f936d，hover 与边框同为 #e8f1ec）
 		*/
 		.navMenu a {
-			color: #272727;
+			/* 文本颜色设置为你要求的颜色 */
+			color: #4f936d;     /* === MODIFIED === (主文字颜色) */
 			text-decoration: none;
 			text-transform: uppercase;
 			display: inline-block;
@@ -61,11 +134,16 @@
 			margin: 0;
 			font-size: 18px;
 
-			/* 平分空间 & 可缩放（关键） */
-			flex: 1 1 0;            /* === MODIFIED === 每项平均分配宽度并可收缩 */
-			min-width: 0;          /* === MODIFIED === 允许在必要时压缩内容，避免溢出 */
-			text-align: center;    /* === MODIFIED === 居中显示图标与文字 */
-			white-space: nowrap;   /* 保持每个链接内不换行 */
+			/* 保持每项平分布局（你之前要求） */
+			flex: 1 1 0;
+			min-width: 0;
+			text-align: center;
+			white-space: nowrap;
+		}
+
+		/* hover 颜色与边框颜色一致（--stroke-color），为 #e8f1ec */
+		.navMenu a:hover {
+			color: var(--stroke-color); /* === MODIFIED === */
 		}
 
 		.background {
@@ -74,11 +152,6 @@
 
 		.border {
 			border: 0px solid #cccccc;
-		}
-
-		/* 悬停颜色（你之前要求 #4f936d，保留） */
-		.navMenu a:hover {
-			color: #4f936d;
 		}
 	</style>
 </head>
@@ -122,9 +195,4 @@
 			else if (id == 'work')
 				url = "https://www.notion.so/1672e5733eb880c08314caa6f82bdea8";
 
-			top.location.href = url;
-		}
-	</script>
-
-</body>
-</html>
+			top.locatio
