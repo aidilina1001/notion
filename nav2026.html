@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+	<!-- Google Font -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&display=swap" rel="stylesheet">
+
+	<style>
+		/* 使页面占满视口并使用 Flex 实现上下左右居中 */
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		body {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			-webkit-box-sizing: border-box;
+			box-sizing: border-box;
+		}
+
+		.navMenu {
+			font-family: "Noto Serif SC", serif;
+			font-optical-sizing: auto;
+			font-weight: 400;
+			font-style: normal;
+			padding: 8px;
+			/* 去除原有 margin，使 Flex 居中生效 */
+			margin: 0;
+
+			/* === MODIFIED ===
+			   为了让链接间距随页面宽度自适应，我把 navMenu 改为 flex 布局并添加了 gap。
+			   解释/可调项：
+			     --nav-gap: 使用 clamp(min, preferred, max) 以响应不同宽度；
+			               你可以调整 clamp 的三个数值来控制最小/首选/最大间距。
+			     width: 使用 min(95%, 1200px) 使菜单在大屏上有最大宽度限制并在小屏上保留边距。
+			     flex-wrap: 允许在窄屏上换行。
+			*/
+			/* 可修改变量（举例） */
+			--nav-gap: clamp(20px, 6vw, 120px); /* === 可调整（控制间距随视口宽度变化） === */
+
+			/* 响应式布局设置（下列为具体实现，若需不同行为可再调整） */
+			display: flex;
+			flex-wrap: wrap;                /* 窄屏时允许换行 */
+			justify-content: center;        /* 在可用宽度上居中分布链接 */
+			align-items: center;
+			gap: var(--nav-gap);            /* 关键：链接之间的自适应间距 */
+			width: min(95%, 1200px);        /* 在大屏限制最大宽度，小屏留边距 */
+		}
+
+		/* === MODIFIED ===
+		   删除固定左右 margin，改为由 flex gap 控制间距。
+		   若你希望每个链接左右仍保留微小内边距，可调整 padding。
+		*/
+		.navMenu a {
+			color: #272727;
+			text-decoration: none;
+			text-transform: uppercase;
+			display: inline-block;
+			padding: 6px;
+			margin: 0;          /* === MODIFIED ===（已移除原先 margin: 0 60px） */
+			font-size: 18px;
+			white-space: nowrap; /* 防止单个链接内部换行（可按需去掉） */
+		}
+
+		.background {
+			background-color: #ece5f0;
+		}
+
+		.border {
+			border: 0px solid #cccccc;
+		}
+
+		/* === MODIFIED ===
+		   悬停颜色改为 #4f936d（你要求的颜色）
+		*/
+		.navMenu a:hover {
+			color: #4f936d;   /* === MODIFIED === */
+		}
+	</style>
+</head>
+
+<body>
+
+	<nav class="navMenu border">
+		<a id="home" onclick="navigate(this.id)" href="#"> <i class="fa-solid fa-house"></i> 返回主页</a>
+		<a id="target" onclick="navigate(this.id)" href="#"> <i class="fa-sharp-duotone fa-solid fa-bullseye"></i> 任务日志</a>
+		<a id="movement" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-list-check"></i> 行动管理</a>
+		<a id="backpack" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-bag-shopping"></i> 我的背包</a>
+		<a id="friend" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-people-robbery"></i> 人际关系</a>
+		<a id="record" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-atom"></i> 人生记录</a>
+		<a id="work" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-comments"></i> 创意工坊</a>
+	</nav>
+
+	<script>
+		let direction = "horizontal";
+		if (direction === "vertical") {
+			document.head.insertAdjacentHTML("beforeend", `<style>
+			.navMenu a {display: block; text-align:left; margin:7px}
+			i {width:15px; margin-right:5px}
+			.navMenu {margin:3px}
+			</style>`);
+		}
+
+		function navigate(id) {
+			let url = "";
+			if (id == 'home')
+				url = "https://www.notion.so/Diane-s-2026-2c62e5733eb880c0b382dfc22790cce8";
+			else if (id == 'target')
+				url = "https://www.notion.so/2c62e5733eb881fd8a58f6c7fbf0562a";
+			else if (id == 'movement')
+				url = "https://www.notion.so/2c62e5733eb881c3b4d9ea81a013ade2";
+			else if (id == 'backpack')
+				url = "https://www.notion.so/2c62e5733eb8816cbfbadbaaab904ce8";
+			else if (id == 'friend')
+				url = "https://www.notion.so/2c62e5733eb881f98190db0b4f4d05c2";
+			else if (id == 'record')
+				url = "https://www.notion.so/2c62e5733eb8814fb5f9f377c0cc103a";
+			else if (id == 'work')
+				url = "https://www.notion.so/2c62e5733eb8814a96a8eb8e0aae542a";
+
+			top.location.href = url;
+		}
+	</script>
+
+</body>
+</html>
