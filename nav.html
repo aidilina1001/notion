@@ -209,13 +209,12 @@
 		}
 
 
-		/* ========== MODIFIED：自动识别运行环境 ========== */
+		/* ========== 自动识别运行环境 ========== */
 
-		// 检测是否运行在 Electron 桌面应用中
 		const isNotionDesktop = /Electron/i.test(navigator.userAgent);
 
 
-		/* ========== 导航页面地址 ========== */
+		/* ========== 页面地址 ========== */
 
 		const pageUrls = {
 			home: "https://app.notion.com/p/Diane-s-2026-32dce5f78ddc8310a07d01f6e461cc48",
@@ -234,28 +233,23 @@
 		};
 
 
-		/* ========== MODIFIED：双模式导航函数 ========== */
+		/* ========== 修改：双模式导航函数 ========== */
 
 		function navigate(id) {
 
 			const url = pageUrls[id];
 
-			// 防止无效链接
+			// 检查页面地址是否存在
 			if (!url) return;
 
 			if (isNotionDesktop) {
 
-				// Notion 桌面端：使用 Notion 深层链接
-				const notionUrl = url.replace(
-					/^https:\/\//i,
-					"notion://"
-				);
-
-				window.location.href = notionUrl;
+				// 桌面端：在新的浏览上下文中打开 HTTPS 页面
+				window.open(url, "_blank");
 
 			} else {
 
-				// Notion 网页版：使用 HTTPS，在当前页面跳转
+				// 网页端：在当前页面直接跳转
 				window.top.location.href = url;
 
 			}
