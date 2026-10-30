@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,7 +11,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&display=swap" rel="stylesheet">
 
 	<style>
-		/* 使页面占满视口并使用 Flex 实现上下左右居中 */
+		/* 基本重置 */
 		html, body {
 			height: 100%;
 			margin: 0;
@@ -19,6 +20,7 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
+			background: transparent;
 		}
 
 		* {
@@ -28,29 +30,124 @@
 			box-sizing: border-box;
 		}
 
+		/* ========== 导航容器 ========== */
 		.navMenu {
 			font-family: "Noto Serif SC", serif;
 			font-optical-sizing: auto;
 			font-weight: 400;
 			font-style: normal;
 			padding: 8px;
-			/* 去除原有 margin，使 Flex 居中生效 */
 			margin: 0;
-			width: fit-content;
+
+			/* 可调参数 */
+			--nav-gap: clamp(28px, 6vw, 240px);
+			--arc-radius: 24px;
+			--arc-thickness: 3px;
+			--stroke-color: #e8f1ec;
+
+			/* 布局：保持单行、平均分配、间距自适应 */
+			display: flex;
+			flex-wrap: nowrap;
+			justify-content: space-between;
+			align-items: center;
+			gap: var(--nav-gap);
+			width: 95%;
+			max-width: none;
+
+			position: relative;
+
+			/* ========== 四角四分之一圆边框 ========== */
+			background-repeat: no-repeat;
+			background-position: left top, right top, left bottom, right bottom;
+			background-size:
+				var(--arc-radius) var(--arc-radius),
+				var(--arc-radius) var(--arc-radius),
+				var(--arc-radius) var(--arc-radius),
+				var(--arc-radius) var(--arc-radius);
+
+			background-image:
+				/* 左上角 */
+				radial-gradient(circle at right bottom,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				),
+				/* 右上角 */
+				radial-gradient(circle at left bottom,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				),
+				/* 左下角 */
+				radial-gradient(circle at right top,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				),
+				/* 右下角 */
+				radial-gradient(circle at left top,
+					transparent calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) calc(var(--arc-radius) - var(--arc-thickness)),
+					var(--stroke-color) var(--arc-radius),
+					transparent var(--arc-radius)
+				);
 		}
 
+		/* ========== 上下点-短横边框 ========== */
+		.navMenu::before,
+		.navMenu::after {
+			content: "";
+			position: absolute;
+			left: var(--arc-radius);
+			right: var(--arc-radius);
+			height: var(--arc-thickness);
+			pointer-events: none;
+			z-index: 0;
+
+			background-image: repeating-linear-gradient(to right,
+				var(--stroke-color) 0px 3px,
+				transparent 3px 7px,
+				var(--stroke-color) 7px 20px,
+				transparent 20px 26px
+			);
+			background-repeat: repeat-x;
+		}
+
+		.navMenu::before { top: 0; }
+		.navMenu::after { bottom: 0; }
+
+		/* 确保内容显示在边框之上 */
+		.navMenu > * {
+			position: relative;
+			z-index: 2;
+		}
+
+		/* ========== 导航文字与图标 ========== */
 		.navMenu a {
-			color: #272727;
+			color: #4f936d;
 			text-decoration: none;
 			text-transform: uppercase;
 			display: inline-block;
 			padding: 6px;
-			/* 左右间距 */
-			margin: 0 60px;
-			/* 字体大小 */
+			margin: 0;
 			font-size: 18px;
+
+			/* 每项平均分配宽度 */
+			flex: 1 1 0;
+			min-width: 0;
+			text-align: center;
+			white-space: nowrap;
 		}
 
+		/* 鼠标悬停颜色 */
+		.navMenu a:hover {
+			color: var(--stroke-color);
+		}
+
+		/* 其他保留的类 */
 		.background {
 			background-color: #ece5f0;
 		}
@@ -58,27 +155,67 @@
 		.border {
 			border: 0px solid #cccccc;
 		}
-
-		.navMenu a:hover {
-			color: #b58ed4;
-		}
 	</style>
 </head>
 
 <body>
 
+	<!-- 
+		导航菜单
+		修改：使用原生 href 链接替代 JavaScript onclick 跳转
+		target="_blank"：在新的浏览上下文打开页面
+	-->
+
 	<nav class="navMenu border">
-		<a id="home" onclick="navigate(this.id)" href="#"> <i class="fa-solid fa-house"></i> 返回主页</a>
-		<a id="target" onclick="navigate(this.id)" href="#"> <i class="fa-sharp-duotone fa-solid fa-bullseye"></i> 任务日志</a>
-		<a id="movement" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-list-check"></i> 行动管理</a>
-		<a id="backpack" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-bag-shopping"></i> 我的背包</a>
-		<a id="friend" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-people-robbery"></i> 人际关系</a>
-		<a id="record" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-atom"></i> 人生记录</a>
-		<a id="work" onclick="navigate(this.id)" href="#"> <i class="fa-duotone fa-solid fa-comments"></i> 创意工坊</a>
+
+		<a id="home"
+		   href="https://www.notion.so/Diane-s-2025-1662e5733eb8806ebf32da507b9bb863"
+		   target="_blank" rel="noopener noreferrer">
+			<i class="fa-solid fa-house"></i> 返回主页
+		</a>
+
+		<a id="target"
+		   href="https://www.notion.so/1672e5733eb8802489d8d447882e8d66"
+		   target="_blank" rel="noopener noreferrer">
+			<i class="fa-sharp-duotone fa-solid fa-bullseye"></i> 任务日志
+		</a>
+
+		<a id="movement"
+		   href="https://www.notion.so/1672e5733eb8801ab9e9fcaa1bb4ad6d"
+		   target="_blank" rel="noopener noreferrer">
+			<i class="fa-duotone fa-solid fa-list-check"></i> 行动管理
+		</a>
+
+		<a id="backpack"
+		   href="https://www.notion.so/1672e5733eb880c2ac1edbf19db1c5cf"
+		   target="_blank" rel="noopener noreferrer">
+			<i class="fa-duotone fa-solid fa-bag-shopping"></i> 我的背包
+		</a>
+
+		<a id="friend"
+		   href="https://www.notion.so/1672e5733eb8806bbb53fb0cccd6f8ee"
+		   target="_blank" rel="noopener noreferrer">
+			<i class="fa-duotone fa-solid fa-people-robbery"></i> 人际关系
+		</a>
+
+		<a id="record"
+		   href="https://www.notion.so/1672e5733eb8802d8bc0dfcde1799f3e"
+		   target="_blank" rel="noopener noreferrer">
+			<i class="fa-duotone fa-solid fa-atom"></i> 人生记录
+		</a>
+
+		<a id="work"
+		   href="https://www.notion.so/1672e5733eb880c08314caa6f82bdea8"
+		   target="_blank" rel="noopener noreferrer">
+			<i class="fa-duotone fa-solid fa-comments"></i> 创意工坊
+		</a>
+
 	</nav>
 
 	<script>
+		/* 原有方向设置，保持不变 */
 		let direction = "horizontal";
+
 		if (direction === "vertical") {
 			document.head.insertAdjacentHTML("beforeend", `<style>
 			.navMenu a {display: block; text-align:left; margin:7px}
@@ -87,25 +224,10 @@
 			</style>`);
 		}
 
-		function navigate(id) {
-			let url = "";
-			if (id == 'home')
-				url = "https://www.notion.so/Diane-s-2025-1662e5733eb8806ebf32da507b9bb863";
-			else if (id == 'target')
-				url = "https://www.notion.so/1672e5733eb8802489d8d447882e8d66";
-			else if (id == 'movement')
-				url = "https://www.notion.so/1672e5733eb8801ab9e9fcaa1bb4ad6d";
-			else if (id == 'backpack')
-				url = "https://www.notion.so/1672e5733eb880c2ac1edbf19db1c5cf";
-			else if (id == 'friend')
-				url = "https://www.notion.so/1672e5733eb8806bbb53fb0cccd6f8ee";
-			else if (id == 'record')
-				url = "https://www.notion.so/1672e5733eb8802d8bc0dfcde1799f3e";
-			else if (id == 'work')
-				url = "https://www.notion.so/1672e5733eb880c08314caa6f82bdea8";
-
-			top.location.href = url;
-		}
+		/* 
+		   原 navigate() 函数已删除。
+		   现在由 HTML 原生 href 直接负责页面跳转。
+		*/
 	</script>
 
 </body>
